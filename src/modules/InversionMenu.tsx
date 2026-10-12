@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { chordName, chordVoicing, inversionName } from '../music/chords';
 import { CHORD_DISPLAY_MIDI, pitchClass, pitchClassName } from '../music/notes';
 import { shiftStepOctave, stepChord, stepVoicing, type ProgressionStep } from '../music/progression';
 import { useMusicStore } from '../state/store';
+import { OCTAVE_DOWN_CODE, OCTAVE_UP_CODE, keyLabels } from '../input/shortcuts';
 
 interface Props {
   step: ProgressionStep;
@@ -21,6 +22,10 @@ export function InversionMenu({ step, anchor, onClose }: Props) {
   const shiftOctave = useMusicStore((s) => s.shiftStepOctave);
   const ref = useRef<HTMLDivElement>(null);
   const chord = stepChord(step);
+  const [keys, setKeys] = useState<[string, string]>(['Z', 'X']);
+  useEffect(() => {
+    void keyLabels([OCTAVE_DOWN_CODE, OCTAVE_UP_CODE]).then(([down, up]) => setKeys([down, up]));
+  }, []);
 
   useEffect(() => {
     const onPointerDown = (e: PointerEvent) => {
@@ -69,11 +74,14 @@ export function InversionMenu({ step, anchor, onClose }: Props) {
     <div ref={ref} className="menu" role="menu" aria-label={`Position de ${name}`} style={{ top: anchor.bottom + 6, left: Math.max(8, left) }}>
       <div className="menu-title">Octave sur le piano</div>
       <div className="menu-octave">
-        <button className="icon-button" onClick={() => shiftOctave(step.id, -1)} disabled={!canShift(-1)} aria-label="Octave plus basse">−</button>
+        <button className="icon-button" onClick={() => shiftOctave(step.id, -1)} disabled={!canShift(-1)} aria-label="Octave plus basse" title={`Octave plus basse (${keys[0]})`}>−</button>
         <span className="menu-octave-value">
           basse en <strong>{bassLabel}</strong>
         </span>
-        <button className="icon-button" onClick={() => shiftOctave(step.id, 1)} disabled={!canShift(1)} aria-label="Octave plus haute">+</button>
+        <button className="icon-button" onClick={() => shiftOctave(step.id, 1)} disabled={!canShift(1)} aria-label="Octave plus haute" title={`Octave plus haute (${keys[1]})`}>+</button>
+      </div>
+      <div className="menu-hint">
+        Raccourcis : <kbd>{keys[0]}</kbd> <kbd>{keys[1]}</kbd> sur l’accord actif
       </div>
       <div className="menu-title">Position</div>
       {options.map((o) => (

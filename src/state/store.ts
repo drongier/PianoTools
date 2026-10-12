@@ -45,6 +45,8 @@ interface MusicState {
   setStepInversion: (id: string, inversion: number | undefined) => void;
   /** Moves a score chord's piano display up or down an octave. */
   shiftStepOctave: (id: string, delta: number) => void;
+  /** Same, for the active score chord; ignored while a chord from the list is shown instead. */
+  shiftActiveStepOctave: (delta: number) => void;
   setActiveStep: (index: number) => void;
   clearProgression: () => void;
 }
@@ -105,6 +107,11 @@ export const useMusicStore = create<MusicState>()(
       removeStep: (id) => set({ progression: removeStep(get().progression, id) }),
       setStepInversion: (id, inversion) => set({ progression: setStepInversion(get().progression, id, inversion) }),
       shiftStepOctave: (id, delta) => set({ progression: shiftStepOctave(get().progression, id, delta) }),
+      shiftActiveStepOctave: (delta) => {
+        const { selected, progression } = get();
+        const step = progression.steps[progression.active];
+        if (!selected && step) get().shiftStepOctave(step.id, delta);
+      },
       setActiveStep: (active) => set({ progression: { ...get().progression, active }, selected: null }),
       clearProgression: () => set({ progression: { steps: [], active: 0 } }),
     }),

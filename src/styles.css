@@ -255,8 +255,21 @@ button { font: inherit; color: inherit; }
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 }
 .menu-title { padding: 4px 8px 6px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
-.menu-octave { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 8px 8px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
+.menu-octave { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 8px 8px; }
 .menu-octave-value { font-size: 13px; color: var(--muted); }
+.menu-hint { padding: 0 8px 8px; margin-top: -4px; margin-bottom: 4px; border-bottom: 1px solid var(--border); font-size: 11px; color: var(--dim); }
+kbd {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 4px;
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 11px;
+  text-align: center;
+  color: var(--muted);
+}
 .menu-octave-value strong { color: var(--text); font-weight: 600; }
 .icon-button:disabled { opacity: 0.35; cursor: default; border-color: var(--border); }
 .step-octave { position: absolute; bottom: 3px; font-size: 10px; color: var(--accent-soft); }
