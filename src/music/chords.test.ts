@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { CHORD_QUALITIES, identifiedChordName, identifyChord, matchesChord } from './chords';
+import {
+  CHORD_QUALITIES, chordCatalog, chordName, chordVoicing, identifiedChordName, identifyChord, matchesChord, satisfiesChord,
+} from './chords';
 
 const q = (id: string) => CHORD_QUALITIES.find((c) => c.id === id)!;
 
@@ -74,5 +76,43 @@ describe('matchesChord', () => {
   it('rejects extra or missing notes', () => {
     expect(matchesChord([60, 64, 67, 70], { root: 0, quality: q('maj') })).toBe(false);
     expect(matchesChord([60, 63, 67], { root: 0, quality: q('maj') })).toBe(false);
+  });
+});
+
+describe('chordCatalog', () => {
+  it('lists every root with every selectable quality, without duplicate names', () => {
+    const names = chordCatalog().map(chordName);
+    expect(names).toContain('C');
+    expect(names).toContain('F#m7');
+    expect(names).toContain('A#maj9');
+    expect(new Set(names).size).toBe(names.length);
+    expect(names.length % 12).toBe(0);
+  });
+});
+
+describe('chordVoicing', () => {
+  it('stacks the chord from the root in the given octave', () => {
+    expect(chordVoicing({ root: 0, quality: q('maj') })).toEqual([60, 64, 67]);
+    expect(chordVoicing({ root: 9, quality: q('min7') })).toEqual([69, 72, 76, 79]);
+  });
+  it('puts the ninth above the root octave', () => {
+    expect(chordVoicing({ root: 0, quality: q('dom9') })).toEqual([60, 64, 67, 70, 74]);
+    expect(chordVoicing({ root: 0, quality: q('add9') })).toEqual([60, 64, 67, 74]);
+  });
+});
+
+describe('satisfiesChord', () => {
+  it('accepts the exact notes in any voicing', () => {
+    expect(satisfiesChord([43, 59, 62, 65], { root: 7, quality: q('dom7') })).toBe(true);
+  });
+  it('accepts a 7th or 9th chord played without its fifth', () => {
+    expect(satisfiesChord([43, 59, 65], { root: 7, quality: q('dom7') })).toBe(true);
+    expect(satisfiesChord([48, 64, 70, 74], { root: 0, quality: q('dom9') })).toBe(true);
+  });
+  it('still requires the fifth of a triad', () => {
+    expect(satisfiesChord([60, 64], { root: 0, quality: q('maj') })).toBe(false);
+  });
+  it('rejects a wrong chord', () => {
+    expect(satisfiesChord([60, 63, 67], { root: 0, quality: q('maj') })).toBe(false);
   });
 });

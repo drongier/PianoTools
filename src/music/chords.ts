@@ -120,3 +120,35 @@ function inversionOf(chord: Chord, bass: PitchClass): number {
 export function matchesChord(midiNotes: readonly number[], chord: Chord): boolean {
   return sameSet(pitchClassSet(midiNotes), new Set(chordPitchClasses(chord)));
 }
+
+export function findQuality(id: string): ChordQuality | undefined {
+  return CHORD_QUALITIES.find((q) => q.id === id);
+}
+
+/** Every chord offered in the picker: all roots × qualities, minus the no-fifth variants. */
+export function chordCatalog(): Chord[] {
+  const qualities = CHORD_QUALITIES.filter((q) => !q.id.endsWith('no5'));
+  return NOTE_NAMES.flatMap((_, root) => qualities.map((quality) => ({ root, quality })));
+}
+
+/** MIDI notes of a close root-position voicing, the ninth placed above the octave. */
+export function chordVoicing(chord: Chord, rootOctaveMidi = 60): number[] {
+  const hasThird = chord.quality.intervals.some((i) => i === 3 || i === 4);
+  return chord.quality.intervals
+    .map((i) => (i === 2 && hasThird ? 14 : i))
+    .sort((a, b) => a - b)
+    .map((i) => rootOctaveMidi + chord.root + i);
+}
+
+/**
+ * True if the played notes are the chord, accepting 7th and 9th chords played
+ * without their fifth, as pianists often do.
+ */
+export function satisfiesChord(midiNotes: readonly number[], chord: Chord): boolean {
+  if (matchesChord(midiNotes, chord)) return true;
+  const { intervals } = chord.quality;
+  const hasSeventh = intervals.includes(10) || intervals.includes(11);
+  if (!hasSeventh || !intervals.includes(7)) return false;
+  const withoutFifth = chordPitchClasses(chord).filter((pc) => pc !== (chord.root + 7) % 12);
+  return sameSet(pitchClassSet(midiNotes), new Set(withoutFifth));
+}

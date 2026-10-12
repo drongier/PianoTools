@@ -3,11 +3,13 @@ import type { NoteInput } from './NoteInput';
 /**
  * Reads every connected MIDI input through the browser's Web MIDI API.
  * Supported in Chrome, Edge and Firefox; not in Safari. Needs HTTPS or localhost.
+ * Resolves to a function that stops listening.
  */
-export async function connectWebMidi(input: NoteInput): Promise<boolean> {
+export async function connectWebMidi(input: NoteInput): Promise<() => void> {
+  const noop = () => {};
   if (!('requestMIDIAccess' in navigator)) {
     input.setStatus('Web MIDI non supporté par ce navigateur (essaie Chrome ou Firefox). Clavier d’ordinateur actif.');
-    return false;
+    return noop;
   }
 
   let access: MIDIAccess;
@@ -15,7 +17,7 @@ export async function connectWebMidi(input: NoteInput): Promise<boolean> {
     access = await navigator.requestMIDIAccess();
   } catch {
     input.setStatus('Accès MIDI refusé. Clavier d’ordinateur actif.');
-    return false;
+    return noop;
   }
 
   const handleMessage = (event: MIDIMessageEvent) => {
@@ -44,5 +46,8 @@ export async function connectWebMidi(input: NoteInput): Promise<boolean> {
 
   access.onstatechange = refresh;
   refresh();
-  return true;
+  return () => {
+    access.onstatechange = null;
+    access.inputs.forEach((port) => { port.onmidimessage = null; });
+  };
 }

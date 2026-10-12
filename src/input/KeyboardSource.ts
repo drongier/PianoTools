@@ -11,10 +11,16 @@ const CODE_TO_OFFSET: Record<string, number> = {
   KeyG: 7, KeyY: 8, KeyH: 9, KeyU: 10, KeyJ: 11, KeyK: 12, KeyO: 13, KeyL: 14,
 };
 
+/** Typing in a text field (e.g. the chord search) must not play notes. */
+function isTyping(target: EventTarget | null): boolean {
+  return target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+}
+
 export function connectComputerKeyboard(input: NoteInput, baseNote = 60): () => void {
   const down = new Set<string>();
 
   const onDown = (e: KeyboardEvent) => {
+    if (isTyping(e.target)) return;
     const offset = CODE_TO_OFFSET[e.code];
     if (offset === undefined || e.repeat || down.has(e.code)) return;
     down.add(e.code);
