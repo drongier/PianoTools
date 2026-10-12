@@ -37,6 +37,36 @@ describe('identifyChord', () => {
   });
 });
 
+describe('identifyChord: common piano voicings', () => {
+  const cases: [string, number[]][] = [
+    ['C6', [60, 64, 67, 69]],
+    ['Am7', [57, 60, 64, 67]],
+    ['Cm6', [60, 63, 67, 69]],
+    ['Am7b5', [57, 60, 63, 67]],
+    ['C7', [48, 64, 70]], // fifth omitted
+    ['Cmaj7', [48, 64, 71]],
+    ['Cm7', [48, 63, 70]],
+    ['Cadd9', [60, 62, 64, 67]],
+    ['Cmadd9', [60, 62, 63, 67]],
+    ['C7sus4', [60, 65, 67, 70]],
+    ['CmMaj7', [60, 63, 67, 71]],
+    ['C9', [48, 64, 67, 70, 74]],
+    ['C9', [48, 64, 70, 74]], // fifth omitted
+    ['Cmaj9', [48, 64, 67, 71, 74]],
+    ['Cm9', [48, 63, 67, 70, 74]],
+  ];
+  it('numbers inversions by the bass note role, not list position', () => {
+    expect(identifyChord([64, 67, 72, 74])!.inversion).toBe(1); // Cadd9/E: third in bass
+    expect(identifyChord([46, 60, 64])!.inversion).toBe(3); // C7/Bb: seventh in bass
+    expect(identifyChord([50, 60, 64, 67])!.inversion).toBe(4); // Cadd9/D: ninth in bass
+    expect(identifyChord([67, 72, 74])!.inversion).toBe(0); // Gsus4 root position
+  });
+
+  it.each(cases)('names %s', (expected, notes) => {
+    expect(identifiedChordName(identifyChord(notes)!)).toBe(expected);
+  });
+});
+
 describe('matchesChord', () => {
   it('accepts any voicing of the target chord', () => {
     expect(matchesChord([55, 60, 64], { root: 0, quality: q('maj') })).toBe(true);

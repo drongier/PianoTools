@@ -47,4 +47,27 @@ describe('ChordDetector', () => {
     d.update(250);
     expect(chords).toEqual([[60, 64, 67], [60, 64, 67, 70]]);
   });
+
+  it('emits the new chord after a legato change (new keys pressed before old ones are lifted)', () => {
+    const { d, chords } = setup();
+    [60, 64, 67].forEach((n) => d.noteOn(n, 0));
+    d.update(100);
+    d.noteOn(65, 500);
+    d.noteOn(69, 510);
+    d.update(570); // stale union C E F G A
+    d.noteOff(64, 600);
+    d.noteOff(67, 605);
+    d.update(700);
+    expect(chords.at(-1)).toEqual([60, 65, 69]);
+  });
+
+  it('does not re-emit when a long-held bass is lifted well after the chord', () => {
+    const { d, chords } = setup();
+    d.noteOn(36, 0);
+    [64, 67, 70].forEach((n) => d.noteOn(n, 500));
+    d.update(600);
+    d.noteOff(36, 2000);
+    d.update(2200);
+    expect(chords).toEqual([[36, 64, 67, 70]]);
+  });
 });

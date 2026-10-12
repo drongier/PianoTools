@@ -23,6 +23,22 @@ export const CHORD_QUALITIES: readonly ChordQuality[] = [
   { id: 'min7', symbol: 'm7', label: 'mineur septième', intervals: [0, 3, 7, 10] },
   { id: 'm7b5', symbol: 'm7b5', label: 'demi-diminué', intervals: [0, 3, 6, 10] },
   { id: 'dim7', symbol: 'dim7', label: 'septième diminuée', intervals: [0, 3, 6, 9] },
+  { id: 'mMaj7', symbol: 'mMaj7', label: 'mineur septième majeure', intervals: [0, 3, 7, 11] },
+  { id: '7sus4', symbol: '7sus4', label: 'septième sus4', intervals: [0, 5, 7, 10] },
+  // Listed after the 7ths: same notes as m7 / m7b5 of another root (C6 = Am7),
+  // so the bass decides and a 7th wins when the bass is neither root.
+  { id: '6', symbol: '6', label: 'sixte', intervals: [0, 4, 7, 9] },
+  { id: 'm6', symbol: 'm6', label: 'mineur sixte', intervals: [0, 3, 7, 9] },
+  { id: 'add9', symbol: 'add9', label: 'add9', intervals: [0, 2, 4, 7] },
+  { id: 'madd9', symbol: 'madd9', label: 'mineur add9', intervals: [0, 2, 3, 7] },
+  { id: 'dom9', symbol: '9', label: 'neuvième de dominante', intervals: [0, 2, 4, 7, 10] },
+  { id: 'maj9', symbol: 'maj9', label: 'neuvième majeure', intervals: [0, 2, 4, 7, 11] },
+  { id: 'min9', symbol: 'm9', label: 'mineur neuvième', intervals: [0, 2, 3, 7, 10] },
+  // Pianists often drop the fifth of 7th and 9th chords.
+  { id: 'dom7no5', symbol: '7', label: 'septième de dominante (sans quinte)', intervals: [0, 4, 10] },
+  { id: 'maj7no5', symbol: 'maj7', label: 'septième majeure (sans quinte)', intervals: [0, 4, 11] },
+  { id: 'min7no5', symbol: 'm7', label: 'mineur septième (sans quinte)', intervals: [0, 3, 10] },
+  { id: 'dom9no5', symbol: '9', label: 'neuvième de dominante (sans quinte)', intervals: [0, 2, 4, 10] },
 ];
 
 export interface Chord {
@@ -33,7 +49,7 @@ export interface Chord {
 export interface IdentifiedChord extends Chord {
   /** Lowest note actually played. */
   bass: PitchClass;
-  /** 0 = root position, 1 = first inversion, ... ; -1 if bass not in chord. */
+  /** 0 = root position, 1 = third in bass, 2 = fifth, 3 = seventh/sixth, 4 = ninth. */
   inversion: number;
 }
 
@@ -85,8 +101,19 @@ export function identifyChord(midiNotes: readonly number[]): IdentifiedChord | n
   if (candidates.length === 0) return null;
 
   const best = candidates.find((c) => c.root === bass) ?? candidates[0];
-  const pcs = chordPitchClasses(best);
-  return { ...best, bass, inversion: pcs.indexOf(bass) };
+  return { ...best, bass, inversion: inversionOf(best, bass) };
+}
+
+/** Inversion from the role of the bass note in the chord. */
+function inversionOf(chord: Chord, bass: PitchClass): number {
+  const interval = (bass - chord.root + 12) % 12;
+  const hasThird = chord.quality.intervals.some((i) => i === 3 || i === 4);
+  if (interval === 0) return 0;
+  if (interval === 3 || interval === 4) return 1;
+  if (interval === 2) return hasThird ? 4 : 1; // ninth, or the 2 of a sus2
+  if (interval === 5) return 1; // the 4 of a sus4
+  if (interval >= 6 && interval <= 8) return 2;
+  return 3;
 }
 
 /** True if the played notes contain exactly the chord's pitch classes (any voicing). */
