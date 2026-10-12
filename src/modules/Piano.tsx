@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import { isBlackKey, noteName, pitchClass } from '../music/notes';
+import { isBlackKey, pitchClass, pitchClassName } from '../music/notes';
 
 const WHITE_W = 24;
 /** Key length bounds, in key widths: keeps keys looking like keys whatever the module size. */
@@ -13,6 +13,8 @@ interface PianoProps {
   target?: readonly number[];
   /** Held notes known to be right even if they are not in the target (chord just validated). */
   right?: readonly number[];
+  /** Label target keys with flats (Bb) rather than sharps (A#). */
+  flats?: boolean;
   low?: number;
   high?: number;
 }
@@ -21,7 +23,8 @@ interface PianoProps {
  * SVG keyboard that stretches to its module. With a target, held keys turn
  * green when they belong to the chord (any octave) and red otherwise.
  */
-export function Piano({ held, target = [], right = [], low = 36, high = 96 }: PianoProps) {
+export function Piano({ held, target = [], right = [], flats = false, low = 36, high = 96 }: PianoProps) {
+  const noteName = (n: number) => pitchClassName(pitchClass(n), flats);
   const heldSet = new Set(held);
   const rightSet = new Set(right);
   const targetSet = new Set(target);

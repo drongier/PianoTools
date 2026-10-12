@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { advance, insertStep, moveStep, removeStep, stepChord, type Progression } from './progression';
+import { advance, insertStep, insertSteps, moveStep, removeStep, stepChord, stepName, type Progression } from './progression';
 
 const step = (id: string, root: number, qualityId = 'maj') => ({ id, root, qualityId });
 const prog = (active = 0): Progression => ({ steps: [step('a', 0), step('b', 5), step('c', 7, 'dom7')], active });
@@ -33,5 +33,23 @@ describe('progression', () => {
     expect(advance(prog(0), [53, 57, 60])).toEqual({ progression: prog(0), hit: false });
     expect(advance(prog(2), [55, 59, 65]).progression.active).toBe(0);
     expect(advance({ steps: [], active: 0 }, [60, 64, 67]).hit).toBe(false);
+  });
+});
+
+describe('insertSteps', () => {
+  it('inserts several steps in order and keeps the active chord', () => {
+    const p = insertSteps(prog(1), [step('x', 2), step('y', 7), step('z', 0)], 1);
+    expect(p.steps.map((s) => s.id)).toEqual(['a', 'x', 'y', 'z', 'b', 'c']);
+    expect(p.steps[p.active].id).toBe('b');
+  });
+  it('appends by default', () => {
+    expect(insertSteps(prog(), [step('x', 2), step('y', 7)]).steps.map((s) => s.id)).toEqual(['a', 'b', 'c', 'x', 'y']);
+  });
+});
+
+describe('step spelling', () => {
+  it('names a step with flats when asked', () => {
+    expect(stepName({ id: 's', root: 10, qualityId: 'maj7', flats: true })).toBe('Bbmaj7');
+    expect(stepName({ id: 's', root: 10, qualityId: 'maj7' })).toBe('A#maj7');
   });
 });

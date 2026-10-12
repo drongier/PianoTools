@@ -1,4 +1,4 @@
-import { NOTE_NAMES, pitchClass, type PitchClass } from './notes';
+import { NOTE_NAMES, pitchClass, pitchClassName, type PitchClass } from './notes';
 
 export interface ChordQuality {
   id: string;
@@ -53,8 +53,8 @@ export interface IdentifiedChord extends Chord {
   inversion: number;
 }
 
-export function chordName(chord: Chord): string {
-  return NOTE_NAMES[chord.root] + chord.quality.symbol;
+export function chordName(chord: Chord, flats = false): string {
+  return pitchClassName(chord.root, flats) + chord.quality.symbol;
 }
 
 /** Name including slash bass for inversions, e.g. "C/E". */

@@ -1,4 +1,4 @@
-import { findQuality, satisfiesChord, type Chord } from './chords';
+import { chordName, findQuality, satisfiesChord, type Chord } from './chords';
 import type { PitchClass } from './notes';
 
 /** One chord placed on the score. Stored by quality id so it can be saved as JSON. */
@@ -6,6 +6,8 @@ export interface ProgressionStep {
   id: string;
   root: PitchClass;
   qualityId: string;
+  /** Spell the root with flats (Bbmaj7 rather than A#maj7). */
+  flats?: boolean;
 }
 
 export interface Progression {
@@ -19,10 +21,20 @@ export function stepChord(step: ProgressionStep): Chord | null {
   return quality ? { root: step.root, quality } : null;
 }
 
+export function stepName(step: ProgressionStep): string {
+  const chord = stepChord(step);
+  return chord ? chordName(chord, step.flats) : '?';
+}
+
 export function insertStep(p: Progression, step: ProgressionStep, index = p.steps.length): Progression {
+  return insertSteps(p, [step], index);
+}
+
+/** Inserts steps in order at `index`; the active step stays the same chord. */
+export function insertSteps(p: Progression, added: ProgressionStep[], index = p.steps.length): Progression {
   const steps = [...p.steps];
-  steps.splice(index, 0, step);
-  const active = p.steps.length > 0 && index <= p.active ? p.active + 1 : p.active;
+  steps.splice(index, 0, ...added);
+  const active = p.steps.length > 0 && index <= p.active ? p.active + added.length : p.active;
   return { steps, active };
 }
 

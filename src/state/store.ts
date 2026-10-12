@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { identifiedChordName, identifyChord, satisfiesChord, type Chord, type IdentifiedChord } from '../music/chords';
-import { advance, insertStep, moveStep, removeStep, stepChord, type Progression } from '../music/progression';
+import { advance, insertSteps, moveStep, removeStep, stepChord, type Progression } from '../music/progression';
 
 const HISTORY_SIZE = 200;
 
@@ -34,6 +34,8 @@ interface MusicState {
   chordPlayed: (notes: number[]) => void;
   toggleSelected: (chord: Chord) => void;
   addChord: (chord: Chord, index?: number) => void;
+  /** Adds several chords in order (e.g. a ii-V-I), optionally spelled with flats. */
+  addChords: (chords: Chord[], index?: number, flats?: boolean) => void;
   moveStep: (from: number, to: number) => void;
   removeStep: (id: string) => void;
   setActiveStep: (index: number) => void;
@@ -82,9 +84,14 @@ export const useMusicStore = create<MusicState>()(
 
       toggleSelected: (chord) => set({ selected: sameChord(get().selected, chord) ? null : chord }),
 
-      addChord: (chord, index) =>
+      addChord: (chord, index) => get().addChords([chord], index),
+      addChords: (chords, index, flats) =>
         set({
-          progression: insertStep(get().progression, { id: crypto.randomUUID(), root: chord.root, qualityId: chord.quality.id }, index),
+          progression: insertSteps(
+            get().progression,
+            chords.map((c) => ({ id: crypto.randomUUID(), root: c.root, qualityId: c.quality.id, ...(flats && { flats }) })),
+            index,
+          ),
           selected: null,
         }),
       moveStep: (from, to) => set({ progression: moveStep(get().progression, from, to) }),
@@ -106,4 +113,9 @@ export function useTargetChord(): Chord | null {
   const selected = useMusicStore((s) => s.selected);
   const step = useMusicStore((s) => s.progression.steps[s.progression.active]);
   return useMemo(() => selected ?? (step ? stepChord(step) : null), [selected, step]);
+}
+
+/** Whether the target chord is spelled with flats (a score step from a flat key). */
+export function useTargetFlats(): boolean {
+  return useMusicStore((s) => !s.selected && !!s.progression.steps[s.progression.active]?.flats);
 }

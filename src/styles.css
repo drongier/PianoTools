@@ -133,6 +133,21 @@ button { font: inherit; color: inherit; }
 
 /* Chord picker */
 .picker { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.tabs { display: flex; gap: 4px; padding: 8px 10px 0; border-bottom: 1px solid var(--border); }
+.tab {
+  padding: 6px 10px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--dim);
+  font-size: 13px;
+  cursor: pointer;
+}
+.tab:hover { color: var(--text); }
+.tab.is-active { color: var(--text); border-bottom-color: var(--accent); }
+.group-item { padding: 6px 10px; cursor: grab; }
+.group-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding-left: 6px; }
+.group-chords { font-size: 16px; font-weight: 500; white-space: pre; overflow: hidden; text-overflow: ellipsis; }
 .picker-search {
   margin: 10px 10px 6px;
   padding: 7px 10px;

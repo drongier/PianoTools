@@ -81,7 +81,7 @@ describe('matchesChord', () => {
 
 describe('chordCatalog', () => {
   it('lists every root with every selectable quality, without duplicate names', () => {
-    const names = chordCatalog().map(chordName);
+    const names = chordCatalog().map((c) => chordName(c));
     expect(names).toContain('C');
     expect(names).toContain('F#m7');
     expect(names).toContain('A#maj9');

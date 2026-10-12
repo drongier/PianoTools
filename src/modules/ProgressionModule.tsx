@@ -1,8 +1,7 @@
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { chordName } from '../music/chords';
-import { stepChord, type ProgressionStep } from '../music/progression';
+import { stepName, type ProgressionStep } from '../music/progression';
 import { useMusicStore } from '../state/store';
 
 export const PROGRESSION_DROP_ID = 'progression';
@@ -37,7 +36,6 @@ function StepCard({ step, index }: { step: ProgressionStep; index: number }) {
     id: step.id,
     data: { kind: 'step' },
   });
-  const chord = stepChord(step);
 
   return (
     <div
@@ -50,7 +48,7 @@ function StepCard({ step, index }: { step: ProgressionStep; index: number }) {
     >
       {hitAt && <span key={hitAt} className="hit-flash" aria-hidden />}
       <span className="step-index">{index + 1}</span>
-      <span className="step-name">{chord ? chordName(chord) : '?'}</span>
+      <span className="step-name">{stepName(step)}</span>
       <button
         className="step-remove"
         onPointerDown={(e) => e.stopPropagation()}

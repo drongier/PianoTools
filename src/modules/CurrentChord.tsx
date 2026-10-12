@@ -1,6 +1,6 @@
 import { chordName, chordPitchClasses, identifiedChordName } from '../music/chords';
 import { NOTE_NAMES, noteNameWithOctave } from '../music/notes';
-import { useMusicStore, useTargetChord } from '../state/store';
+import { useMusicStore, useTargetChord, useTargetFlats } from '../state/store';
 
 const INVERSION_LABELS = ['état fondamental', '1er renversement', '2e renversement', '3e renversement', 'neuvième à la basse'];
 
@@ -10,6 +10,7 @@ export function CurrentChord() {
   const held = useMusicStore((s) => s.held);
   const lastHit = useMusicStore((s) => s.lastHit);
   const target = useTargetChord();
+  const flats = useTargetFlats();
 
   let name = '—';
   let detail = 'Joue un accord';
@@ -31,7 +32,7 @@ export function CurrentChord() {
       <div className="current-held">{held.map(noteNameWithOctave).join('  ')}</div>
       {target && (
         <div className="current-target">
-          Cible : <strong>{chordName(target)}</strong>
+          Cible : <strong>{chordName(target, flats)}</strong>
         </div>
       )}
     </div>

@@ -1,6 +1,13 @@
 /** Note names using sharps. Index = pitch class (0 = C). */
 export const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
 
+/** Same pitch classes spelled with flats, for flat keys (Bb, Eb, Ab…). */
+export const NOTE_NAMES_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'] as const;
+
+export function pitchClassName(pc: number, flats = false): string {
+  return (flats ? NOTE_NAMES_FLAT : NOTE_NAMES)[pc];
+}
+
 export type PitchClass = number; // 0..11
 
 export function pitchClass(midiNote: number): PitchClass {

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { chordCatalog, chordName, type Chord } from '../music/chords';
 import { NOTE_NAMES } from '../music/notes';
+import { TWO_FIVE_ONES, type ChordGroup } from '../music/twoFiveOne';
 import { useMusicStore } from '../state/store';
 
 const CATALOG = chordCatalog();
@@ -20,8 +21,59 @@ function matches(chord: Chord, query: string): boolean {
   return chordName(chord).toLowerCase().startsWith(query) || chord.quality.label.toLowerCase().includes(query);
 }
 
-/** Scrollable list of every chord. Click to show it on the piano, drag or + to add it to the score. */
+type Tab = 'all' | 'ii-V-I';
+
+/** Chord sources for the score, one tab each. */
 export function ChordPicker() {
+  const [tab, setTab] = useState<Tab>('all');
+  return (
+    <div className="picker">
+      <div className="tabs" role="tablist">
+        <button role="tab" aria-selected={tab === 'all'} className={`tab ${tab === 'all' ? 'is-active' : ''}`} onClick={() => setTab('all')}>
+          Tous les accords
+        </button>
+        <button role="tab" aria-selected={tab === 'ii-V-I'} className={`tab ${tab === 'ii-V-I' ? 'is-active' : ''}`} onClick={() => setTab('ii-V-I')}>
+          ii-V-I
+        </button>
+      </div>
+      {tab === 'all' ? <AllChords /> : <TwoFiveOneList />}
+    </div>
+  );
+}
+
+/** ii-V-I in every major key, in the practice-sheet order. Drag or + adds the three chords. */
+function TwoFiveOneList() {
+  return (
+    <ul className="picker-list scroll">
+      {TWO_FIVE_ONES.map((group) => <GroupItem key={group.id} group={group} />)}
+    </ul>
+  );
+}
+
+function GroupItem({ group }: { group: ChordGroup }) {
+  const addChords = useMusicStore((s) => s.addChords);
+  const { setNodeRef, attributes, listeners, isDragging } = useDraggable({ id: group.id, data: { kind: 'group', group } });
+  const names = group.chords.map((c) => chordName(c, group.flats));
+  return (
+    <li ref={setNodeRef} className={`picker-item group-item ${isDragging ? 'is-dragging' : ''}`} {...attributes} {...listeners}>
+      <div className="group-main">
+        <span className="group-chords">{names.join('  ')}</span>
+        <span className="picker-label">ii-V-I en {group.keyName} majeur</span>
+      </div>
+      <button
+        className="icon-button"
+        onClick={() => addChords(group.chords, undefined, group.flats)}
+        title="Ajouter à la partition"
+        aria-label={`Ajouter ${names.join(' ')} à la partition`}
+      >
+        +
+      </button>
+    </li>
+  );
+}
+
+/** Scrollable list of every chord. Click to show it on the piano, drag or + to add it to the score. */
+function AllChords() {
   const [root, setRoot] = useState<number | null>(null);
   const [query, setQuery] = useState('');
   const items = useMemo(() => {
@@ -30,7 +82,7 @@ export function ChordPicker() {
   }, [root, query]);
 
   return (
-    <div className="picker">
+    <>
       <input
         className="picker-search"
         type="search"
@@ -49,7 +101,7 @@ export function ChordPicker() {
         {items.map((c) => <PickerItem key={catalogDragId(c)} chord={c} />)}
         {items.length === 0 && <li className="empty">Aucun accord trouvé.</li>}
       </ul>
-    </div>
+    </>
   );
 }
 
