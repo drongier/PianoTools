@@ -11,5 +11,7 @@ new Phaser.Game({
     width: 1280,
     height: 720,
   },
+  // Lets scenes overlay HTML elements (the scrollable chord history).
+  dom: { createContainer: true },
   scene: [ChordDetectorScene],
 });
