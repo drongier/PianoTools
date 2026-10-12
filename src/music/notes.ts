@@ -1,0 +1,21 @@
+/** Note names using sharps. Index = pitch class (0 = C). */
+export const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
+
+export type PitchClass = number; // 0..11
+
+export function pitchClass(midiNote: number): PitchClass {
+  return ((midiNote % 12) + 12) % 12;
+}
+
+export function noteName(midiNote: number): string {
+  return NOTE_NAMES[pitchClass(midiNote)];
+}
+
+/** Scientific pitch notation: MIDI 60 = C4. */
+export function noteNameWithOctave(midiNote: number): string {
+  return `${noteName(midiNote)}${Math.floor(midiNote / 12) - 1}`;
+}
+
+export function isBlackKey(midiNote: number): boolean {
+  return [1, 3, 6, 8, 10].includes(pitchClass(midiNote));
+}
