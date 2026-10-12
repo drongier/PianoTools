@@ -131,13 +131,29 @@ export function chordCatalog(): Chord[] {
   return NOTE_NAMES.flatMap((_, root) => qualities.map((quality) => ({ root, quality })));
 }
 
-/** MIDI notes of a close root-position voicing, the ninth placed above the octave. */
-export function chordVoicing(chord: Chord, rootOctaveMidi = 60): number[] {
+/**
+ * MIDI notes of a close voicing, the ninth placed above the octave.
+ * `inversion` moves that many lowest notes up an octave (1 = third in the bass).
+ * The result is shifted by octaves so its bass sits near `middleMidi`.
+ */
+export function chordVoicing(chord: Chord, middleMidi = 60, inversion = 0): number[] {
   const hasThird = chord.quality.intervals.some((i) => i === 3 || i === 4);
-  return chord.quality.intervals
+  const stacked = chord.quality.intervals
     .map((i) => (i === 2 && hasThird ? 14 : i))
     .sort((a, b) => a - b)
-    .map((i) => rootOctaveMidi + chord.root + i);
+    .map((i) => middleMidi + chord.root + i);
+  const k = Math.max(0, Math.min(inversion, stacked.length - 1));
+  const notes = [...stacked.slice(k), ...stacked.slice(0, k).map((n) => n + 12)];
+  let shift = 0;
+  while (notes[0] + shift >= middleMidi + 6) shift -= 12;
+  while (notes[0] + shift < middleMidi - 7) shift += 12;
+  return notes.map((n) => n + shift);
+}
+
+const INVERSION_NAMES = ['état fondamental', '1er renversement', '2e renversement', '3e renversement', '4e renversement'];
+
+export function inversionName(inversion: number): string {
+  return INVERSION_NAMES[inversion] ?? `${inversion}e renversement`;
 }
 
 /**

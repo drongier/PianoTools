@@ -7,7 +7,7 @@ Un tableau de bord de modules déplaçables et redimensionnables (on les attrape
 - **Accord joué** : nom, qualité, renversement et notes de l'accord que tu joues.
 - **Historique** : les accords joués, le plus récent en haut.
 - **Accords** : la liste de tous les accords, avec recherche et filtre par fondamentale. Un clic affiche l'accord sur le piano.
-- **Partition** : glisse des accords depuis la liste (ou clique sur +) pour composer une suite. L'accord en surbrillance est le prochain à jouer ; le jouer correctement passe au suivant.
+- **Partition** : glisse des accords depuis la liste (ou clique sur +) pour composer une suite. L'accord en surbrillance est le prochain à jouer ; le jouer correctement passe au suivant. Un clic sur un accord ouvre un menu pour choisir sa position (fondamental, renversements, ou position libre) : avec une position imposée, il faut jouer la bonne basse. Le même menu monte ou descend l'accord d'une octave sur le piano ; c'est un repère visuel, l'accord est validé dans toutes les octaves.
 - **Piano** : les touches de l'accord cible sont teintées ; tes touches passent au vert si elles sont justes, au rouge sinon.
 
 La disposition et la partition sont gardées dans le navigateur.

@@ -1,8 +1,11 @@
 import { useMemo } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { identifiedChordName, identifyChord, satisfiesChord, type Chord, type IdentifiedChord } from '../music/chords';
-import { advance, insertSteps, moveStep, removeStep, stepChord, type Progression } from '../music/progression';
+import { chordName, chordVoicing, identifiedChordName, identifyChord, satisfiesChord, type Chord, type IdentifiedChord } from '../music/chords';
+import {
+  advance, insertSteps, moveStep, removeStep, setStepInversion, shiftStepOctave, stepChord, stepName, stepVoicing, type Progression,
+} from '../music/progression';
+import { CHORD_DISPLAY_MIDI } from '../music/notes';
 
 const HISTORY_SIZE = 200;
 
@@ -38,6 +41,10 @@ interface MusicState {
   addChords: (chords: Chord[], index?: number, flats?: boolean) => void;
   moveStep: (from: number, to: number) => void;
   removeStep: (id: string) => void;
+  /** Position to play a score chord in; undefined accepts any voicing. */
+  setStepInversion: (id: string, inversion: number | undefined) => void;
+  /** Moves a score chord's piano display up or down an octave. */
+  shiftStepOctave: (id: string, delta: number) => void;
   setActiveStep: (index: number) => void;
   clearProgression: () => void;
 }
@@ -96,6 +103,8 @@ export const useMusicStore = create<MusicState>()(
         }),
       moveStep: (from, to) => set({ progression: moveStep(get().progression, from, to) }),
       removeStep: (id) => set({ progression: removeStep(get().progression, id) }),
+      setStepInversion: (id, inversion) => set({ progression: setStepInversion(get().progression, id, inversion) }),
+      shiftStepOctave: (id, delta) => set({ progression: shiftStepOctave(get().progression, id, delta) }),
       setActiveStep: (active) => set({ progression: { ...get().progression, active }, selected: null }),
       clearProgression: () => set({ progression: { steps: [], active: 0 } }),
     }),
@@ -107,15 +116,24 @@ export const useMusicStore = create<MusicState>()(
   ),
 );
 
-/** The chord the piano should light up: the picked chord, else the active score step. */
-export function useTargetChord(): Chord | null {
+/** The chord to play now: the one picked in the list, else the active score step. */
+export interface Target {
+  chord: Chord;
+  /** Display name, with slash bass for an inverted score step. */
+  name: string;
+  /** Notes shown on the piano, in the chosen position. */
+  notes: number[];
+  flats: boolean;
+}
+
+export function useTarget(): Target | null {
   // Select stable references only; deriving a new object inside the selector would re-render forever.
   const selected = useMusicStore((s) => s.selected);
   const step = useMusicStore((s) => s.progression.steps[s.progression.active]);
-  return useMemo(() => selected ?? (step ? stepChord(step) : null), [selected, step]);
-}
-
-/** Whether the target chord is spelled with flats (a score step from a flat key). */
-export function useTargetFlats(): boolean {
-  return useMusicStore((s) => !s.selected && !!s.progression.steps[s.progression.active]?.flats);
+  return useMemo(() => {
+    if (selected) return { chord: selected, name: chordName(selected), notes: chordVoicing(selected, CHORD_DISPLAY_MIDI), flats: false };
+    const chord = step && stepChord(step);
+    if (!chord) return null;
+    return { chord, name: stepName(step), notes: stepVoicing(step), flats: !!step.flats };
+  }, [selected, step]);
 }

@@ -8,6 +8,13 @@ export function pitchClassName(pc: number, flats = false): string {
   return (flats ? NOTE_NAMES_FLAT : NOTE_NAMES)[pc];
 }
 
+/** Range of the on-screen keyboard: C2 to C7. */
+export const PIANO_LOW = 36;
+export const PIANO_HIGH = 96;
+
+/** Where chords are drawn on the piano by default: around C3, an octave below middle C. */
+export const CHORD_DISPLAY_MIDI = 48;
+
 export type PitchClass = number; // 0..11
 
 export function pitchClass(midiNote: number): PitchClass {

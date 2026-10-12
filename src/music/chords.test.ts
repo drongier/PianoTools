@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  CHORD_QUALITIES, chordCatalog, chordName, chordVoicing, identifiedChordName, identifyChord, matchesChord, satisfiesChord,
+  CHORD_QUALITIES, chordCatalog, chordName, chordVoicing, identifiedChordName, identifyChord, inversionName, matchesChord, satisfiesChord,
 } from './chords';
 
 const q = (id: string) => CHORD_QUALITIES.find((c) => c.id === id)!;
@@ -93,7 +93,7 @@ describe('chordCatalog', () => {
 describe('chordVoicing', () => {
   it('stacks the chord from the root in the given octave', () => {
     expect(chordVoicing({ root: 0, quality: q('maj') })).toEqual([60, 64, 67]);
-    expect(chordVoicing({ root: 9, quality: q('min7') })).toEqual([69, 72, 76, 79]);
+    expect(chordVoicing({ root: 9, quality: q('min7') })).toEqual([57, 60, 64, 67]); // kept near middle C
   });
   it('puts the ninth above the root octave', () => {
     expect(chordVoicing({ root: 0, quality: q('dom9') })).toEqual([60, 64, 67, 70, 74]);
@@ -114,5 +114,30 @@ describe('satisfiesChord', () => {
   });
   it('rejects a wrong chord', () => {
     expect(satisfiesChord([60, 63, 67], { root: 0, quality: q('maj') })).toBe(false);
+  });
+});
+
+describe('chordVoicing with inversions', () => {
+  it('moves the lowest notes up an octave', () => {
+    expect(chordVoicing({ root: 0, quality: q('maj') }, 60, 1)).toEqual([64, 67, 72]);
+    expect(chordVoicing({ root: 0, quality: q('maj') }, 60, 2)).toEqual([55, 60, 64]);
+    expect(chordVoicing({ root: 7, quality: q('dom7') }, 60, 3)).toEqual([65, 67, 71, 74]);
+  });
+  it('keeps the voicing around the middle of the keyboard', () => {
+    for (let root = 0; root < 12; root++) {
+      for (let inv = 0; inv < 4; inv++) {
+        const notes = chordVoicing({ root, quality: q('maj7') }, 60, inv);
+        expect(notes[0]).toBeGreaterThanOrEqual(53);
+        expect(notes[0]).toBeLessThan(66);
+      }
+    }
+  });
+});
+
+describe('inversionName', () => {
+  it('names root position and inversions in French', () => {
+    expect(inversionName(0)).toBe('état fondamental');
+    expect(inversionName(1)).toBe('1er renversement');
+    expect(inversionName(3)).toBe('3e renversement');
   });
 });
