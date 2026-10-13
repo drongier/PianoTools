@@ -1,4 +1,4 @@
-import { audioToPerformanceMs } from './clock';
+import { heardTimeMs } from './clock';
 
 export interface MetronomeStart {
   tempo: number;
@@ -35,7 +35,14 @@ export class Metronome {
     };
     schedule();
     this.timer = window.setInterval(schedule, TICK_MS);
-    return audioToPerformanceMs(outputStamp(ctx), startAt + countInBeats * beat, ctx.outputLatency || 0);
+    // getOutputTimestamp is missing in some browsers (Safari): fall back to "now" plus the latencies.
+    const stamp = typeof ctx.getOutputTimestamp === 'function' ? ctx.getOutputTimestamp() : null;
+    return heardTimeMs(
+      startAt + countInBeats * beat,
+      stamp ? { contextTime: stamp.contextTime ?? 0, performanceTime: stamp.performanceTime ?? 0 } : null,
+      { contextTime: ctx.currentTime, performanceTime: performance.now() },
+      (ctx.outputLatency || 0) + (ctx.baseLatency || 0),
+    );
   }
 
   stop(): void {
@@ -54,11 +61,4 @@ export class Metronome {
     osc.start(time);
     osc.stop(time + 0.06);
   }
-}
-
-/** A matching (audio time, performance time) pair; falls back to "now" before audio output starts. */
-function outputStamp(ctx: AudioContext): { contextTime: number; performanceTime: number } {
-  const stamp = ctx.getOutputTimestamp();
-  if (stamp.contextTime && stamp.performanceTime) return { contextTime: stamp.contextTime, performanceTime: stamp.performanceTime };
-  return { contextTime: ctx.currentTime, performanceTime: performance.now() };
 }
