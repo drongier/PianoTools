@@ -20,12 +20,12 @@ export function connectComputerKeyboard(input: NoteInput, baseNote = 60): () => 
     const offset = CODE_TO_OFFSET[e.code];
     if (offset === undefined || e.repeat || down.has(e.code)) return;
     down.add(e.code);
-    input.emitNoteOn(baseNote + offset, 100);
+    input.emitNoteOn(baseNote + offset, 100, e.timeStamp);
   };
   const onUp = (e: KeyboardEvent) => {
     const offset = CODE_TO_OFFSET[e.code];
     if (offset === undefined || !down.delete(e.code)) return;
-    input.emitNoteOff(baseNote + offset);
+    input.emitNoteOff(baseNote + offset, e.timeStamp);
   };
   const releaseAll = () => {
     for (const code of down) input.emitNoteOff(baseNote + CODE_TO_OFFSET[code]);

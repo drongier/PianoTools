@@ -2,6 +2,7 @@ import { NoteInput } from '../input/NoteInput';
 import { connectWebMidi } from '../input/WebMidiSource';
 import { connectComputerKeyboard } from '../input/KeyboardSource';
 import { connectOctaveShortcuts } from '../input/shortcuts';
+import { publishRawNoteEvent } from '../input/rawEvents';
 import { ChordDetector } from '../music/ChordDetector';
 import { useMusicStore } from './store';
 
@@ -15,14 +16,17 @@ export function startEngine(): () => void {
   const detector = new ChordDetector();
 
   input.onStatus(store.setStatus);
-  input.onNoteOn((note) => {
+  input.onNoteOn((note, velocity, time) => {
+    publishRawNoteEvent({ type: 'on', note, velocity, time });
     detector.noteOn(note, performance.now());
     store.setHeld(detector.heldNotes());
   });
-  input.onNoteOff((note) => {
+  input.onNoteOff((note, _velocity, time) => {
+    publishRawNoteEvent({ type: 'off', note, time });
     detector.noteOff(note, performance.now());
     store.setHeld(detector.heldNotes());
   });
+  input.onSustain((down, time) => publishRawNoteEvent({ type: 'sustain', down, time }));
   detector.onChord = store.chordPlayed;
 
   let frame = 0;

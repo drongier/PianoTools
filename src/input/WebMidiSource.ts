@@ -23,12 +23,14 @@ export async function connectWebMidi(input: NoteInput): Promise<() => void> {
   const handleMessage = (event: MIDIMessageEvent) => {
     const data = event.data;
     if (!data || data.length < 2) return;
+    // MIDI events carry their own timestamp, in the performance.now() clock.
+    const time = event.timeStamp > 0 ? event.timeStamp : performance.now();
     const command = data[0] & 0xf0;
     const d1 = data[1];
     const d2 = data.length > 2 ? data[2] : 0;
-    if (command === 0x90 && d2 > 0) input.emitNoteOn(d1, d2);
-    else if (command === 0x80 || (command === 0x90 && d2 === 0)) input.emitNoteOff(d1);
-    else if (command === 0xb0 && d1 === 64) input.emitSustain(d2 >= 64);
+    if (command === 0x90 && d2 > 0) input.emitNoteOn(d1, d2, time);
+    else if (command === 0x80 || (command === 0x90 && d2 === 0)) input.emitNoteOff(d1, time);
+    else if (command === 0xb0 && d1 === 64) input.emitSustain(d2 >= 64, time);
   };
 
   const refresh = () => {
