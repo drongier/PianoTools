@@ -58,9 +58,9 @@ export function chordName(chord: Chord, flats = false): string {
 }
 
 /** Name including slash bass for inversions, e.g. "C/E". */
-export function identifiedChordName(chord: IdentifiedChord): string {
-  const base = chordName(chord);
-  return chord.bass === chord.root ? base : `${base}/${NOTE_NAMES[chord.bass]}`;
+export function identifiedChordName(chord: IdentifiedChord, flats = false): string {
+  const base = chordName(chord, flats);
+  return chord.bass === chord.root ? base : `${base}/${pitchClassName(chord.bass, flats)}`;
 }
 
 export function chordPitchClasses(chord: Chord): PitchClass[] {

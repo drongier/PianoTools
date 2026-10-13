@@ -141,3 +141,12 @@ describe('inversionName', () => {
     expect(inversionName(3)).toBe('3e renversement');
   });
 });
+
+describe('identifiedChordName with flats', () => {
+  it('spells root and bass with flats when asked', () => {
+    const c = identifyChord([46, 50, 53, 56])!; // Bb7 in root position
+    expect(identifiedChordName(c)).toBe('A#7');
+    expect(identifiedChordName(c, true)).toBe('Bb7');
+    expect(identifiedChordName(identifyChord([51, 55, 58, 61])!, true)).toBe('Eb7');
+  });
+});
