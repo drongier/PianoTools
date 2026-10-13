@@ -36,6 +36,16 @@ button { font: inherit; color: inherit; }
   padding: 12px 16px 0;
 }
 .topbar h1 { margin: 0; font-size: 18px; font-weight: 600; }
+.page-tabs { display: flex; gap: 4px; }
+.page-tab {
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+.page-tab:hover { color: var(--text); background: var(--panel-raised); }
+.page-tab.is-active { color: var(--text); background: var(--accent-bg); }
 .topbar-status { flex: 1; min-width: 0; color: var(--dim); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .text-button {

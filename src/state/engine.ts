@@ -3,6 +3,7 @@ import { connectWebMidi } from '../input/WebMidiSource';
 import { connectComputerKeyboard } from '../input/KeyboardSource';
 import { connectOctaveShortcuts } from '../input/shortcuts';
 import { publishRawNoteEvent } from '../input/rawEvents';
+import { routeFromHash } from '../routing';
 import { ChordDetector } from '../music/ChordDetector';
 import { useMusicStore } from './store';
 
@@ -37,7 +38,10 @@ export function startEngine(): () => void {
   frame = requestAnimationFrame(tick);
 
   const disconnectKeyboard = connectComputerKeyboard(input);
-  const disconnectShortcuts = connectOctaveShortcuts(store.shiftActiveStepOctave);
+  // W/X move the active Playground chord, which only exists on the Training page.
+  const disconnectShortcuts = connectOctaveShortcuts((delta) => {
+    if (routeFromHash(window.location.hash) === 'training') store.shiftActiveStepOctave(delta);
+  });
   let disposed = false;
   let disconnectMidi = () => {};
   void connectWebMidi(input).then((disconnect) => {

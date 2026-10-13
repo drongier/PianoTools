@@ -1,3 +1,4 @@
+import { create } from 'zustand';
 import type { Layout, LayoutItem } from 'react-grid-layout';
 
 export const GRID_COLS = 12;
@@ -31,3 +32,22 @@ export function saveLayout(layout: Layout): void {
     // Storage blocked: the layout just won't be remembered.
   }
 }
+
+interface LayoutState {
+  layout: Layout;
+  setLayout: (layout: Layout) => void;
+  reset: () => void;
+}
+
+/** Training-page layout, shared with the top bar's reset button. */
+export const useLayoutStore = create<LayoutState>()((set) => ({
+  layout: loadLayout(),
+  setLayout: (layout) => {
+    saveLayout(layout);
+    set({ layout });
+  },
+  reset: () => {
+    saveLayout(DEFAULT_LAYOUT);
+    set({ layout: DEFAULT_LAYOUT });
+  },
+}));
