@@ -329,3 +329,47 @@ kbd {
 .key-c4 { fill: #b0b4c4; }
 .key-label { font-size: 9px; text-anchor: middle; fill: #2a2f55; font-weight: 600; pointer-events: none; }
 .key-label-black { fill: var(--text); font-size: 7px; }
+
+/* Studio */
+.studio { display: flex; flex-direction: column; gap: 12px; padding: 16px; height: calc(100vh - 90px); min-height: 560px; }
+.transport { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+.field { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.field input[type='number'], .field select {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+.field input[type='number'] { width: 72px; }
+.field-check { cursor: pointer; }
+.rec-button {
+  margin-left: auto;
+  padding: 7px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--panel-raised);
+  color: var(--text);
+  font-weight: 500;
+  cursor: pointer;
+}
+.rec-button.is-idle:hover { border-color: var(--bad); }
+.rec-button.is-countIn { border-color: var(--accent); color: var(--accent-soft); }
+.rec-button.is-recording { border-color: var(--bad); background: rgba(229, 72, 77, 0.18); animation: rec-pulse 1.2s ease-in-out infinite; }
+@keyframes rec-pulse { 50% { background: rgba(229, 72, 77, 0.32); } }
+.banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--panel-raised); font-size: 14px; }
+.studio-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 280px 1fr; gap: 12px; }
+.studio-takes, .studio-score { min-height: 0; }
+.studio-piano { height: 130px; flex: none; }
+.take-list { list-style: none; margin: 0; padding: 4px 0; flex: 1; min-height: 0; }
+.take { display: flex; align-items: center; gap: 4px; padding: 2px 8px 2px 4px; }
+.take:hover { background: var(--panel-raised); }
+.take.is-selected { background: var(--accent-bg); }
+.take-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 6px; border: none; background: none; text-align: left; cursor: pointer; }
+.take-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.take-meta { font-size: 12px; color: var(--dim); }
+.take-rename { flex: 1; min-width: 0; margin: 4px; padding: 5px 8px; border: 1px solid var(--accent); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: 14px; }
+.transcription-settings { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.score-view { flex: 1; min-height: 0; overflow: auto; padding: 8px 12px; }
+.score-view svg { display: block; }
