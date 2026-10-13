@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { clampTempo, useStudioStore } from './store';
+import { STORAGE_FULL_MESSAGE, clampTempo, useStudioStore } from './store';
 import { DEFAULT_TRANSCRIPTION, type Take } from './take';
 
 const take = (id: string, extra: Partial<Take> = {}): Take => ({
@@ -54,5 +54,31 @@ describe('studio store', () => {
     const t = useStudioStore.getState().takes[0];
     expect(t.settings).toMatchObject({ grid: 8, flats: true, triplets: true });
     expect(t.tempo).toBe(90);
+  });
+});
+
+describe('studio store storage', () => {
+  const setLocalStorage = (descriptor: PropertyDescriptor) => Object.defineProperty(globalThis, 'localStorage', { configurable: true, ...descriptor });
+  const removeLocalStorage = () => { delete (globalThis as { localStorage?: unknown }).localStorage; };
+
+  it('keeps working when browser storage is blocked', () => {
+    setLocalStorage({ get() { throw new Error('SecurityError: access denied'); } });
+    try {
+      expect(() => useStudioStore.getState().setMessage('ok')).not.toThrow();
+      expect(useStudioStore.getState().message).toBe('ok');
+    } finally {
+      removeLocalStorage();
+    }
+  });
+
+  it('tells the user when storage is full', async () => {
+    setLocalStorage({ value: { getItem: () => null, removeItem: () => {}, setItem: () => { throw new DOMException('full', 'QuotaExceededError'); } } });
+    try {
+      useStudioStore.getState().addTake(take('a'));
+      await Promise.resolve();
+      expect(useStudioStore.getState().message).toBe(STORAGE_FULL_MESSAGE);
+    } finally {
+      removeLocalStorage();
+    }
   });
 });

@@ -33,20 +33,25 @@ export function clampTempo(n: number): number {
   return Number.isFinite(n) ? Math.round(Math.min(240, Math.max(40, n))) : 90;
 }
 
+function isQuotaError(error: unknown): boolean {
+  return error instanceof DOMException && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED');
+}
+
 /** localStorage that reports a full quota instead of throwing. */
 const safeStorage: StateStorage = {
   getItem: (key) => {
     try { return localStorage.getItem(key); } catch { return null; }
   },
   setItem: (key, value) => {
-    if (typeof localStorage === 'undefined') return; // tests, or storage disabled
     try {
+      // Even reading `localStorage` throws when the browser blocks storage.
+      if (typeof localStorage === 'undefined') return;
       localStorage.setItem(key, value);
-    } catch {
-      // Only set the message once: setting state triggers another save.
-      if (useStudioStore.getState().message !== STORAGE_FULL_MESSAGE) {
-        queueMicrotask(() => useStudioStore.setState({ message: STORAGE_FULL_MESSAGE }));
-      }
+    } catch (error) {
+      // Blocked storage: takes just aren't remembered. Full storage: tell the user, once,
+      // since setting state triggers another save.
+      if (!isQuotaError(error) || useStudioStore.getState().message === STORAGE_FULL_MESSAGE) return;
+      queueMicrotask(() => useStudioStore.setState({ message: STORAGE_FULL_MESSAGE }));
     }
   },
   removeItem: (key) => {
