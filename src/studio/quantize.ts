@@ -49,7 +49,9 @@ export function quantize(take: Pick<Take, 'tempo' | 'beatsPerBar' | 'bars' | 'no
   }
 
   const steps = (beat: number) => (tripletBeats.has(beat) ? 3 : binary);
-  const snap = (beat: number, x: number) => beat * T + Math.round(x * steps(beat)) * (T / steps(beat));
+  // Never snap before the beat start: an early onset (x < 0) belongs to this beat's first grid point,
+  // even when the triplet grid would round it back into the previous beat.
+  const snap = (beat: number, x: number) => beat * T + Math.max(0, Math.round(x * steps(beat))) * (T / steps(beat));
 
   const notes = located.map(({ note, beat, x }) => {
     const step = T / steps(beat);

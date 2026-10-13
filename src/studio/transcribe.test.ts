@@ -101,3 +101,33 @@ describe('transcribe', () => {
     expectFullMeasures(s);
   });
 });
+
+describe('transcribe invariants', () => {
+  /** Deterministic pseudo-random generator so the test is reproducible. */
+  function rng(seed: number) {
+    let s = seed;
+    return () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648);
+  }
+
+  it('always fills every bar exactly, for every grid and triplet setting', () => {
+    const random = rng(42);
+    for (const grid of [8, 16] as const) {
+      for (const triplets of [false, true]) {
+        for (let i = 0; i < 150; i++) {
+          const bars = 1 + Math.floor(random() * 3);
+          const notes = Array.from({ length: Math.floor(random() * 14) }, () => {
+            const start = random() * bars * 4000;
+            return n(36 + Math.floor(random() * 48), start, start + 20 + random() * 2000);
+          });
+          const s = transcribe(take(notes, bars, { grid, triplets }));
+          for (const m of s.measures) {
+            for (const staff of [m.treble, m.bass]) {
+              expect(staff.every((e) => Number.isFinite(e.ticks) && e.ticks > 0)).toBe(true);
+              expect(staff.reduce((sum, e) => sum + e.ticks, 0)).toBe(48);
+            }
+          }
+        }
+      }
+    }
+  });
+});

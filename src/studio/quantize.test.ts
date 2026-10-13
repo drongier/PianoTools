@@ -53,3 +53,10 @@ describe('quantize', () => {
     expect(q.notes[0].end).toBe(48);
   });
 });
+
+describe('quantize regressions', () => {
+  it('keeps an early onset on its triplet beat with the eighth grid', () => {
+    const q = quantize(take([n(72, 0, 900), n(74, 1790, 2300), n(76, 2333, 2650), n(77, 2667, 2990)]), 8, true);
+    expect(starts(q)).toEqual([0, 24, 28, 32]);
+  });
+});
