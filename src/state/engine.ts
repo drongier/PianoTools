@@ -28,7 +28,10 @@ export function startEngine(): () => void {
     store.setHeld(detector.heldNotes());
   });
   input.onSustain((down, time) => publishRawNoteEvent({ type: 'sustain', down, time }));
-  detector.onChord = store.chordPlayed;
+  // Chords played in the Studio must not advance the Training page's Playground or history.
+  detector.onChord = (notes) => {
+    if (routeFromHash(window.location.hash) === 'training') store.chordPlayed(notes);
+  };
 
   let frame = 0;
   const tick = () => {
