@@ -15,9 +15,16 @@ npm run dev
 
 Open the URL shown in **Chrome** or **Edge** (Firefox works too), plug in your MIDI keyboard and allow MIDI access when the browser asks. The device name appears at the top of the page once connected.
 
+## Pages
+
+The app has two pages, picked with the tabs in the top bar:
+
+- **Entraînement** (training), at `#/`: the dashboard of modules described below.
+- **Studio**, at `#/studio`: record what you play and read it back as sheet music. See [The Studio page](#the-studio-page).
+
 ## The dashboard
 
-The screen is a grid of modules you can arrange as you like:
+The Training page is a grid of modules you can arrange as you like:
 
 - **Move** a module: grab it by its title bar.
 - **Resize** it: drag its bottom-right corner.
@@ -91,6 +98,46 @@ A keyboard from C2 to C7 showing what to play and what you are playing:
 
 The target chord is the one picked in the chord list if there is one, otherwise the active Playground chord. It is drawn around C3 by default, an octave below middle C. After a correct chord, keys you are still holding stay green while the Playground moves on to the next chord.
 
+## The Studio page
+
+Record your improvisations on a click track and get a two-staff piano score you can tidy up afterwards.
+
+### Recording
+
+1. Set the **tempo** (40 to 240, default 90), the **time signature** (4/4, 3/4 or 2/4) and whether the **metronome** clicks during the take. These settings are remembered.
+2. Click **"● Enregistrer"** (record). One bar of count-in clicks plays first, even with the metronome off.
+3. Recording starts on the first beat after the count-in. A note played in the last half beat of the count-in counts as an anticipation and moves to beat 1; earlier notes are ignored.
+4. Click **"■ Arrêter"** (stop). Notes still held end there, and the take is rounded up to the next full bar. Stopping during the count-in keeps nothing, and a take without notes is not saved.
+
+Leaving the Studio page while recording stops and saves the take. The computer keyboard works too, so you can record without a MIDI keyboard.
+
+### Takes
+
+The **Prises** (takes) list shows the newest take first, with its tempo, time signature and length. A new take is selected automatically. Click a take to see its score, "✎" to rename it, "×" to delete it after confirming.
+
+Each take keeps exactly what you played: every note with its start, end and velocity, plus sustain pedal changes. The score is only a reading of that raw take, so changing a setting never loses anything.
+
+### Transcription settings
+
+Set per take, above the score. The score is redrawn immediately.
+
+| Setting | Values | Default |
+|---|---|---|
+| Grille (grid) | sixteenth or eighth notes | sixteenth |
+| Triolets (triplets) | on or off | on |
+| Clé de sol à partir de (treble from) | C3 to C5 | C4: C4 and above go on the treble staff |
+| Altérations (accidentals) | sharps or flats | sharps |
+| Noms d'accords (chord names) | shown or hidden | shown |
+
+How the score is built:
+
+- Each beat gets the grid that fits its notes best, binary or triplet. Binary wins when in doubt, to avoid stray triplets.
+- Rhythms are written as played: swung eighths come out as triplet rhythms.
+- Notes starting together on a staff form a chord. Durations are split into readable values and tied across barlines.
+- Chord names above the staff come from the same detection as the Training page, shown when the chord changes.
+
+Limits of this version: one voice per staff (a note held under moving notes on the same staff is shortened), no key signature, and no compound meters such as 6/8.
+
 ## Keyboard shortcuts
 
 ### Octave of the active chord
@@ -102,7 +149,7 @@ These are the same keys as in Ableton Live, matched by their physical position o
 | Move the active chord down an octave | <kbd>W</kbd> | <kbd>Z</kbd> |
 | Move the active chord up an octave | <kbd>X</kbd> | <kbd>X</kbd> |
 
-They act on the active Playground chord. They are ignored:
+They act on the active Playground chord, on the Training page only. They are ignored:
 
 - while typing in the search field;
 - when the target chord comes from the chord list;
@@ -164,6 +211,7 @@ Everything stays local, in the browser's storage. Nothing is sent anywhere.
 
 - `pianotools.layout.v1`: the module layout.
 - `pianotools.progression.v1`: the Playground, with each chord's position and octave.
+- `pianotools.studio.v1`: the Studio takes, their transcription settings, and the transport settings.
 
 Clearing the site's data resets everything.
 
@@ -176,7 +224,7 @@ npm run typecheck  # TypeScript check
 npm run build      # static build in dist/
 ```
 
-Stack: TypeScript, React, Vite, Vitest. The grid uses react-grid-layout, drag and drop uses dnd-kit, and shared state uses Zustand.
+Stack: TypeScript, React, Vite, Vitest. The grid uses react-grid-layout, drag and drop uses dnd-kit, shared state uses Zustand, and the Studio draws scores with abcjs.
 
 ### Structure
 
@@ -187,6 +235,8 @@ Stack: TypeScript, React, Vite, Vitest. The grid uses react-grid-layout, drag an
 | `src/state/` | State shared between modules (`store.ts`) and wiring of inputs to the detector (`engine.ts`). |
 | `src/modules/` | One React component per dashboard module. |
 | `src/dashboard/` | The grid, module frames and default layout. |
+| `src/pages/` | The Training and Studio pages, picked by the hash route (`src/routing.ts`). |
+| `src/studio/` | The Studio: recorder, metronome, quantization, transcription, ABC output, store and components. Recording, transcription and ABC logic are pure and tested. |
 
 ### Adding a module
 
