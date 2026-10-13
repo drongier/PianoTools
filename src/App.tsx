@@ -81,6 +81,7 @@ export function App() {
         <button className="text-button" onClick={() => changeLayout(DEFAULT_LAYOUT)}>Réinitialiser la disposition</button>
       </header>
       <Dashboard layout={layout} onLayoutChange={changeLayout} />
+      <footer className="footer">Made by Damien Rongier</footer>
       <DragOverlay dropAnimation={null}>{dragLabel && <div className="drag-chip">{dragLabel}</div>}</DragOverlay>
     </DndContext>
   );

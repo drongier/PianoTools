@@ -63,8 +63,8 @@ function GroupItem({ group }: { group: ChordGroup }) {
       <button
         className="icon-button"
         onClick={() => addChords(group.chords, undefined, group.flats)}
-        title="Ajouter à la partition"
-        aria-label={`Ajouter ${names.join(' ')} à la partition`}
+        title="Ajouter au playground"
+        aria-label={`Ajouter ${names.join(' ')} au playground`}
       >
         +
       </button>
@@ -120,7 +120,7 @@ function PickerItem({ chord }: { chord: Chord }) {
         <span className="picker-name">{chordName(chord)}</span>
         <span className="picker-label">{chord.quality.label}</span>
       </button>
-      <button className="icon-button" onClick={() => addChord(chord)} title="Ajouter à la partition" aria-label={`Ajouter ${chordName(chord)} à la partition`}>
+      <button className="icon-button" onClick={() => addChord(chord)} title="Ajouter au playground" aria-label={`Ajouter ${chordName(chord)} au playground`}>
         +
       </button>
     </li>

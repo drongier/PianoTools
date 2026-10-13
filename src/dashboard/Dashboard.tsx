@@ -19,7 +19,7 @@ const MODULES: Record<string, ModuleDef> = {
   picker: { title: 'Accords', Component: ChordPicker },
   current: { title: 'Accord joué', Component: CurrentChord },
   history: { title: 'Historique', Component: ChordHistory },
-  progression: { title: 'Partition', Component: ProgressionModule, Actions: ClearProgressionButton },
+  progression: { title: 'Playground', Component: ProgressionModule, Actions: ClearProgressionButton },
   piano: { title: 'Piano', Component: PianoModule },
 };
 

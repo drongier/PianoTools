@@ -1,6 +1,6 @@
 # Piano Tools
 
-A browser dashboard for practising chords on the piano. Plug in a MIDI keyboard and play: the app recognises the chord, shows you what to play on an on-screen piano, and walks you through a chord progression like a score.
+A browser dashboard for practising chords on the piano. Plug in a MIDI keyboard and play: the app recognises the chord, shows you what to play on an on-screen piano, and walks you through a chord progression of your own.
 
 No piano at hand? Your computer keyboard works as a fallback keyboard.
 
@@ -50,14 +50,14 @@ The chord library, in two tabs.
 - **Search** by name or type: "Am7", "sus4", "mineur" (minor)… Flats are understood: "Bbm7" finds A#m7.
 - **Filter** by root with the C, C#, D… chips.
 - **Click a chord** to show it on the piano as the target. Click it again to clear it.
-- **"+"** adds the chord to the end of the score.
-- **Drag a chord** onto the score to drop it where you want.
+- **"+"** adds the chord to the end of the Playground.
+- **Drag a chord** onto the Playground to drop it where you want.
 
-**ii-V-I**: the ii-V-I in all 12 major keys, in the classic practice order: C, Bb, Ab, Gb, E, D, B, A, G, F, Eb, Db. Each row, e.g. "Dm7 G7 Cmaj7", is added to the score with "+" or by drag and drop, and places its three chords there. Flat keys are spelled with flats, e.g. Bbmaj7.
+**ii-V-I**: the ii-V-I in all 12 major keys, in the classic practice order: C, Bb, Ab, Gb, E, D, B, A, G, F, Eb, Db. Each row, e.g. "Dm7 G7 Cmaj7", is added to the Playground with "+" or by drag and drop, and places its three chords there. Flat keys are spelled with flats, e.g. Bbmaj7.
 
-### Partition (score)
+### Playground
 
-Your chord progression, to play in order. The outlined chord is the **next one to play**. When you play it correctly, the score moves to the next chord, and loops back to the start after the last one.
+Your chord progression, to play in order. The outlined chord is the **next one to play**. When you play it correctly, the Playground moves to the next chord, and loops back to the start after the last one.
 
 - **Reorder**: drag a card.
 - **Remove** a chord: hover its card and click "×".
@@ -89,7 +89,7 @@ A keyboard from C2 to C7 showing what to play and what you are playing:
 | Green | pressed key that belongs to the target chord, in any octave |
 | Red | pressed key that doesn't belong to the target chord |
 
-The target chord is the one picked in the chord list if there is one, otherwise the active score chord. It is drawn around C3 by default, an octave below middle C. After a correct chord, keys you are still holding stay green while the score moves on to the next chord.
+The target chord is the one picked in the chord list if there is one, otherwise the active Playground chord. It is drawn around C3 by default, an octave below middle C. After a correct chord, keys you are still holding stay green while the Playground moves on to the next chord.
 
 ## Keyboard shortcuts
 
@@ -102,7 +102,7 @@ These are the same keys as in Ableton Live, matched by their physical position o
 | Move the active chord down an octave | <kbd>W</kbd> | <kbd>Z</kbd> |
 | Move the active chord up an octave | <kbd>X</kbd> | <kbd>X</kbd> |
 
-They act on the active score chord. They are ignored:
+They act on the active Playground chord. They are ignored:
 
 - while typing in the search field;
 - when the target chord comes from the chord list;
@@ -123,7 +123,7 @@ These keys play nothing while you type in the search field.
 
 | Key | Action |
 |---|---|
-| <kbd>Escape</kbd> | close a score chord's menu |
+| <kbd>Escape</kbd> | close a Playground chord's menu |
 
 ## How chords are recognised
 
@@ -134,7 +134,7 @@ These keys play nothing while you type in the search field.
 - **Legato changes are followed**: if you put down the new chord before lifting the old one, old notes released within 300 ms count as a chord change.
 - **At least 3 different notes are needed**.
 - **Symmetric chords** (augmented, diminished sevenths) take the bass as root.
-- **A seventh or ninth chord played without its fifth** is accepted as correct on the score.
+- **A seventh or ninth chord played without its fifth** is accepted as correct in the Playground.
 
 Recognised chord types:
 
@@ -163,7 +163,7 @@ MIDI goes through the Web MIDI API. It needs the page to be served locally, as w
 Everything stays local, in the browser's storage. Nothing is sent anywhere.
 
 - `pianotools.layout.v1`: the module layout.
-- `pianotools.progression.v1`: the score, with each chord's position and octave.
+- `pianotools.progression.v1`: the Playground, with each chord's position and octave.
 
 Clearing the site's data resets everything.
 
@@ -182,7 +182,7 @@ Stack: TypeScript, React, Vite, Vitest. The grid uses react-grid-layout, drag an
 
 | Folder | Role |
 |---|---|
-| `src/music/` | Pure, tested music logic: chord library, identification, chord detector, score, ii-V-I. Independent of the UI. |
+| `src/music/` | Pure, tested music logic: chord library, identification, chord detector, chord progressions, ii-V-I. Independent of the UI. |
 | `src/input/` | Note sources, Web MIDI and computer keyboard, brought together in `NoteInput`, plus keyboard shortcuts. |
 | `src/state/` | State shared between modules (`store.ts`) and wiring of inputs to the detector (`engine.ts`). |
 | `src/modules/` | One React component per dashboard module. |
@@ -196,4 +196,4 @@ Stack: TypeScript, React, Vite, Vitest. The grid uses react-grid-layout, drag an
 
 ### Adding a chord type
 
-Add a line to `CHORD_QUALITIES` in `src/music/chords.ts`: an id, the displayed symbol, a French name and the intervals in semitones from the root. The new type then shows up in the chord list, detection and the score.
+Add a line to `CHORD_QUALITIES` in `src/music/chords.ts`: an id, the displayed symbol, a French name and the intervals in semitones from the root. The new type then shows up in the chord list, detection and the Playground.

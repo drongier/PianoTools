@@ -66,6 +66,8 @@ button { font: inherit; color: inherit; }
 
 .scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
 
+.footer { padding: 4px 16px 16px; text-align: center; font-size: 12px; color: var(--dim); }
+
 /* Grid */
 .dashboard { width: 100%; }
 .react-grid-item.react-grid-placeholder { background: var(--accent); opacity: 0.15; border-radius: 10px; }
