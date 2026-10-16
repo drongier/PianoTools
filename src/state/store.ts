@@ -6,6 +6,7 @@ import {
   advance, insertSteps, moveStep, removeStep, setStepInversion, shiftStepOctave, stepChord, stepName, stepVoicing, type Progression,
 } from '../music/progression';
 import { CHORD_DISPLAY_MIDI } from '../music/notes';
+import { defaultScaleFor, findScaleType, type Scale } from '../music/scales';
 
 const HISTORY_SIZE = 200;
 
@@ -31,6 +32,8 @@ interface MusicState {
   lastHit: Hit | null;
   /** Notes of the last correct chord, still held: they stay green after the target moves on. */
   hitNotes: number[];
+  /** Scale dotted on the piano, locked by the first chord played; null = armed for the next chord. */
+  scale: Scale | null;
 
   setStatus: (status: string) => void;
   setHeld: (notes: number[]) => void;
@@ -49,6 +52,10 @@ interface MusicState {
   shiftActiveStepOctave: (delta: number) => void;
   setActiveStep: (index: number) => void;
   clearProgression: () => void;
+  /** Removes the scale dots; the next chord played locks a new scale. */
+  clearScale: () => void;
+  /** Swaps the locked scale for another type on the same root. */
+  setScaleType: (id: string) => void;
 }
 
 const sameChord = (a: Chord | null, b: Chord) => a?.root === b.root && a.quality.id === b.quality.id;
@@ -64,15 +71,17 @@ export const useMusicStore = create<MusicState>()(
       progression: { steps: [], active: 0 },
       lastHit: null,
       hitNotes: [],
+      scale: null,
 
       setStatus: (status) => set({ status }),
       setHeld: (held) => set({ held, hitNotes: get().hitNotes.filter((n) => held.includes(n)) }),
 
       chordPlayed: (notes) => {
         const chord = identifyChord(notes);
-        const { history, selected, progression } = get();
+        const { history, selected, progression, scale } = get();
         const name = chord && identifiedChordName(chord);
         const update: Partial<MusicState> = { played: { notes, chord } };
+        if (chord && !scale) update.scale = defaultScaleFor(chord);
         if (name && history[0] !== name) update.history = [name, ...history].slice(0, HISTORY_SIZE);
 
         if (selected) {
@@ -114,6 +123,12 @@ export const useMusicStore = create<MusicState>()(
       },
       setActiveStep: (active) => set({ progression: { ...get().progression, active }, selected: null }),
       clearProgression: () => set({ progression: { steps: [], active: 0 } }),
+      clearScale: () => set({ scale: null }),
+      setScaleType: (id) => {
+        const { scale } = get();
+        const type = findScaleType(id);
+        if (scale && type) set({ scale: { ...scale, type } });
+      },
     }),
     {
       name: 'pianotools.progression.v1',

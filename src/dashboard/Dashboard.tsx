@@ -6,7 +6,7 @@ import { CurrentChord } from '../modules/CurrentChord';
 import { ChordHistory } from '../modules/ChordHistory';
 import { ChordPicker } from '../modules/ChordPicker';
 import { ClearProgressionButton, ProgressionModule } from '../modules/ProgressionModule';
-import { PianoModule } from '../modules/PianoModule';
+import { PianoModule, ScaleActions } from '../modules/PianoModule';
 
 interface ModuleDef {
   title: string;
@@ -20,7 +20,7 @@ const MODULES: Record<string, ModuleDef> = {
   current: { title: 'Accord joué', Component: CurrentChord },
   history: { title: 'Historique', Component: ChordHistory },
   progression: { title: 'Playground', Component: ProgressionModule, Actions: ClearProgressionButton },
-  piano: { title: 'Piano', Component: PianoModule },
+  piano: { title: 'Piano', Component: PianoModule, Actions: ScaleActions },
 };
 
 export function Dashboard({ layout, onLayoutChange }: { layout: Layout; onLayoutChange: (layout: Layout) => void }) {

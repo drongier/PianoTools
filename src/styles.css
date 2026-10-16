@@ -319,3 +319,22 @@ kbd {
 .key-c4 { fill: #b0b4c4; }
 .key-label { font-size: 9px; text-anchor: middle; fill: #2a2f55; font-weight: 600; pointer-events: none; }
 .key-label-black { fill: var(--text); font-size: 7px; }
+.scale-dot { pointer-events: none; }
+.scale-dot-white { fill: var(--accent); }
+.scale-dot-black { fill: var(--accent-soft); }
+.scale-dot.is-tonic { stroke: var(--target-black); stroke-width: 1.5; }
+.scale-dot-black.is-tonic { stroke: var(--white-key); }
+/* Readable on the green / red / blue of a pressed key */
+.scale-dot.is-pressed { fill: rgba(255, 255, 255, 0.9); }
+
+.scale-actions { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.scale-root { color: var(--text); font-weight: 600; }
+.scale-select {
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+

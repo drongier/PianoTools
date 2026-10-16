@@ -15,6 +15,10 @@ interface PianoProps {
   right?: readonly number[];
   /** Label target keys with flats (Bb) rather than sharps (A#). */
   flats?: boolean;
+  /** Pitch classes of a scale, dotted on every octave. */
+  scale?: readonly number[];
+  /** Tonic of that scale, drawn with a bigger dot. */
+  scaleRoot?: number;
   low?: number;
   high?: number;
 }
@@ -23,12 +27,15 @@ interface PianoProps {
  * SVG keyboard that stretches to its module. With a target, held keys turn
  * green when they belong to the chord (any octave) and red otherwise.
  */
-export function Piano({ held, target = [], right = [], flats = false, low = PIANO_LOW, high = PIANO_HIGH }: PianoProps) {
+export function Piano({
+  held, target = [], right = [], flats = false, scale = [], scaleRoot, low = PIANO_LOW, high = PIANO_HIGH,
+}: PianoProps) {
   const noteName = (n: number) => pitchClassName(pitchClass(n), flats);
   const heldSet = new Set(held);
   const rightSet = new Set(right);
   const targetSet = new Set(target);
   const targetPcs = new Set(target.map(pitchClass));
+  const scalePcs = new Set(scale);
   const whites: number[] = [];
   for (let n = low; n <= high; n++) if (!isBlackKey(n)) whites.push(n);
   const xOf = new Map(whites.map((n, i) => [n, i * WHITE_W]));
@@ -47,6 +54,16 @@ export function Piano({ held, target = [], right = [], flats = false, low = PIAN
     return classes.join(' ');
   };
 
+  /** Scale dot, unless the key already shows a target label. */
+  const scaleDot = (n: number, cx: number, cy: number) => {
+    if (targetSet.has(n) || !scalePcs.has(pitchClass(n))) return null;
+    const tonic = pitchClass(n) === scaleRoot;
+    const classes = ['scale-dot', isBlackKey(n) ? 'scale-dot-black' : 'scale-dot-white'];
+    if (tonic) classes.push('is-tonic');
+    if (heldSet.has(n)) classes.push('is-pressed');
+    return <circle className={classes.join(' ')} cx={cx} cy={cy} r={tonic ? 4 : 3} />;
+  };
+
   const blacks: number[] = [];
   for (let n = low; n <= high; n++) if (isBlackKey(n) && xOf.has(n - 1)) blacks.push(n);
 
@@ -56,7 +73,8 @@ export function Piano({ held, target = [], right = [], flats = false, low = PIAN
         <g key={n}>
           <rect className={keyClass(n)} x={xOf.get(n)! + 0.5} y={0} width={WHITE_W - 1} height={WHITE_H} rx={2} />
           {targetSet.has(n) && <text className="key-label" x={xOf.get(n)! + WHITE_W / 2} y={WHITE_H - 10}>{noteName(n)}</text>}
-          {n === 60 && !targetSet.has(n) && <circle className="key-c4" cx={xOf.get(n)! + WHITE_W / 2} cy={WHITE_H - 10} r={2.5} />}
+          {scaleDot(n, xOf.get(n)! + WHITE_W / 2, WHITE_H - 10)}
+          {n === 60 && !targetSet.has(n) && !scalePcs.has(pitchClass(n)) && <circle className="key-c4" cx={xOf.get(n)! + WHITE_W / 2} cy={WHITE_H - 10} r={2.5} />}
         </g>
       ))}
       {blacks.map((n) => {
@@ -65,6 +83,7 @@ export function Piano({ held, target = [], right = [], flats = false, low = PIAN
           <g key={n}>
             <rect className={keyClass(n)} x={x} y={0} width={BLACK_W} height={BLACK_H} rx={1.5} />
             {targetSet.has(n) && <text className="key-label key-label-black" x={x + BLACK_W / 2} y={BLACK_H - 8}>{noteName(n)}</text>}
+            {scaleDot(n, x + BLACK_W / 2, BLACK_H - 8)}
           </g>
         );
       })}
