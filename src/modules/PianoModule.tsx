@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { pitchClassName } from '../music/notes';
+import { NOTE_NAMES } from '../music/notes';
 import { SCALE_TYPES, scalePitchClasses } from '../music/scales';
 import { useMusicStore, useTarget } from '../state/store';
 import { Piano } from './Piano';
@@ -17,22 +17,24 @@ export function PianoModule() {
   );
 }
 
-/** Locked scale with a menu to switch its type, and a button to re-arm on the next chord. */
+/** Menus to pick the scale root and type, and a button to clear it and re-arm on the next chord. */
 export function ScaleActions() {
   const scale = useMusicStore((s) => s.scale);
   const clearScale = useMusicStore((s) => s.clearScale);
   const setScaleType = useMusicStore((s) => s.setScaleType);
+  const setScaleRoot = useMusicStore((s) => s.setScaleRoot);
   return (
     <div className="scale-actions">
+      <select className="scale-select" aria-label="Tonique" value={scale?.root ?? ''} onChange={(e) => setScaleRoot(Number(e.target.value))}>
+        {!scale && <option value="" disabled>—</option>}
+        {NOTE_NAMES.map((name, pc) => <option key={pc} value={pc}>{name}</option>)}
+      </select>
       {scale ? (
-        <>
-          <span className="scale-root">{pitchClassName(scale.root)}</span>
-          <select className="scale-select" aria-label="Gamme" value={scale.type.id} onChange={(e) => setScaleType(e.target.value)}>
-            {SCALE_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
-          </select>
-        </>
+        <select className="scale-select" aria-label="Gamme" value={scale.type.id} onChange={(e) => setScaleType(e.target.value)}>
+          {SCALE_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+        </select>
       ) : (
-        <span>Joue un accord pour afficher sa gamme</span>
+        <span>ou joue un accord</span>
       )}
       <button className="text-button" onClick={clearScale} disabled={!scale}>Effacer</button>
     </div>

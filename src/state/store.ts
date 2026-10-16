@@ -5,7 +5,7 @@ import { chordName, chordVoicing, identifiedChordName, identifyChord, satisfiesC
 import {
   advance, insertSteps, moveStep, removeStep, setStepInversion, shiftStepOctave, stepChord, stepName, stepVoicing, type Progression,
 } from '../music/progression';
-import { CHORD_DISPLAY_MIDI } from '../music/notes';
+import { CHORD_DISPLAY_MIDI, type PitchClass } from '../music/notes';
 import { defaultScaleFor, findScaleType, type Scale } from '../music/scales';
 
 const HISTORY_SIZE = 200;
@@ -56,6 +56,8 @@ interface MusicState {
   clearScale: () => void;
   /** Swaps the locked scale for another type on the same root. */
   setScaleType: (id: string) => void;
+  /** Moves the locked scale to another root, or locks its major scale when armed. */
+  setScaleRoot: (root: PitchClass) => void;
 }
 
 const sameChord = (a: Chord | null, b: Chord) => a?.root === b.root && a.quality.id === b.quality.id;
@@ -129,6 +131,7 @@ export const useMusicStore = create<MusicState>()(
         const type = findScaleType(id);
         if (scale && type) set({ scale: { ...scale, type } });
       },
+      setScaleRoot: (root) => set({ scale: { root, type: get().scale?.type ?? findScaleType('major')! } }),
     }),
     {
       name: 'pianotools.progression.v1',

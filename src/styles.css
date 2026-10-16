@@ -328,7 +328,6 @@ kbd {
 .scale-dot.is-pressed { fill: rgba(255, 255, 255, 0.9); }
 
 .scale-actions { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
-.scale-root { color: var(--text); font-weight: 600; }
 .scale-select {
   padding: 3px 6px;
   border: 1px solid var(--border);

@@ -46,4 +46,17 @@ describe('scale lock', () => {
     useMusicStore.getState().setScaleType('dorian');
     expect(useMusicStore.getState().scale).toBeNull();
   });
+
+  it('locks the major scale of a note picked while armed', () => {
+    useMusicStore.getState().setScaleRoot(5);
+    expect(useMusicStore.getState().scale).toMatchObject({ root: 5, type: { id: 'major' } });
+  });
+
+  it('moves the locked scale to another root, keeping its type', () => {
+    const s = useMusicStore.getState();
+    s.chordPlayed(A_MINOR);
+    s.setScaleType('dorian');
+    s.setScaleRoot(2);
+    expect(useMusicStore.getState().scale).toMatchObject({ root: 2, type: { id: 'dorian' } });
+  });
 });
