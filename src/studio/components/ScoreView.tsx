@@ -30,5 +30,11 @@ export function ScoreView({ take }: { take: Take }) {
   if (abc === null || renderError) {
     return <p className="empty score-error">La partition n’a pas pu être affichée. La prise est intacte : essaie d’autres réglages.</p>;
   }
-  return <div ref={ref} className="score-view" />;
+  // abcjs restyles the svg's parent (overflow: hidden, aspect-ratio padding), so it
+  // draws into an inner div and the outer one stays the scroll container.
+  return (
+    <div className="score-view">
+      <div ref={ref} />
+    </div>
+  );
 }
