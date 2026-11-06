@@ -45,7 +45,7 @@ The chords you played, newest first and in larger type. The same chord played se
 
 The chord library, in two tabs.
 
-**Tous les accords (all chords)**: the 12 roots combined with 20 chord types.
+**Tous les accords (all chords)**: the 12 roots combined with 21 chord types.
 
 - **Search** by name or type: "Am7", "sus4", "mineur" (minor)… Flats are understood: "Bbm7" finds A#m7.
 - **Filter** by root with the C, C#, D… chips.
@@ -53,7 +53,9 @@ The chord library, in two tabs.
 - **"+"** adds the chord to the end of the Playground.
 - **Drag a chord** onto the Playground to drop it where you want.
 
-**ii-V-I**: the ii-V-I in all 12 major keys, in the classic practice order: C, Bb, Ab, Gb, E, D, B, A, G, F, Eb, Db. Each row, e.g. "Dm7 G7 Cmaj7", is added to the Playground with "+" or by drag and drop, and places its three chords there. Flat keys are spelled with flats, e.g. Bbmaj7.
+**Gamme (scale)**: the chords built on each degree of the scale picked in the Piano module, as triads and seventh chords, with their Roman numeral relative to the major scale: in B natural minor, "i Bm7", "iiø7 C#m7b5", "♭III Dmaj7"… The root and scale menus are repeated at the top of the tab. Above the table, the key's ii-V-I: "C#m7b5 F#7 Bm7" in B minor. When the scale lacks the V7's leading tone, as in natural minor, a note explains that the V7 borrows it from the harmonic minor. Click a chord to show it on the piano, "+" or drag to add it to the Playground. Degree chords need a 7-note scale.
+
+**ii-V-I**: the ii-V-I in all 12 major keys, or with "Mineur" (minor) the iiø7-V7-im7 in all 12 minor keys, e.g. "C#m7b5 F#7 Bm7", in the classic practice order: C, Bb, Ab, Gb, E, D, B, A, G, F, Eb, Db. Each row, e.g. "Dm7 G7 Cmaj7", is added to the Playground with "+" or by drag and drop, and places its three chords there. Flat keys are spelled with flats, e.g. Bbmaj7.
 
 ### Playground
 
@@ -141,7 +143,7 @@ Recognised chord types:
 | Family | Chords |
 |---|---|
 | Triads | major, m, dim, aug, sus2, sus4 |
-| Sevenths | 7, maj7, m7, m7b5, dim7, mMaj7, 7sus4 |
+| Sevenths | 7, maj7, m7, m7b5, dim7, mMaj7, maj7#5, 7sus4 |
 | Sixths | 6, m6 |
 | Ninths | add9, madd9, 9, maj9, m9 |
 | Without fifth | 7, maj7, m7, 9 played without the fifth |

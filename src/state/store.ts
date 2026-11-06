@@ -28,6 +28,8 @@ interface MusicState {
   history: string[];
   /** Chord picked in the list: shown on the piano until unselected. */
   selected: Chord | null;
+  /** Spell the selected chord with flats (picked from a flat key). */
+  selectedFlats: boolean;
   progression: Progression;
   lastHit: Hit | null;
   /** Notes of the last correct chord, still held: they stay green after the target moves on. */
@@ -38,7 +40,7 @@ interface MusicState {
   setStatus: (status: string) => void;
   setHeld: (notes: number[]) => void;
   chordPlayed: (notes: number[]) => void;
-  toggleSelected: (chord: Chord) => void;
+  toggleSelected: (chord: Chord, flats?: boolean) => void;
   addChord: (chord: Chord, index?: number) => void;
   /** Adds several chords in order (e.g. a ii-V-I), optionally spelled with flats. */
   addChords: (chords: Chord[], index?: number, flats?: boolean) => void;
@@ -70,6 +72,7 @@ export const useMusicStore = create<MusicState>()(
       played: null,
       history: [],
       selected: null,
+      selectedFlats: false,
       progression: { steps: [], active: 0 },
       lastHit: null,
       hitNotes: [],
@@ -102,7 +105,8 @@ export const useMusicStore = create<MusicState>()(
         set(update);
       },
 
-      toggleSelected: (chord) => set({ selected: sameChord(get().selected, chord) ? null : chord }),
+      toggleSelected: (chord, flats = false) =>
+        set({ selected: sameChord(get().selected, chord) ? null : chord, selectedFlats: flats }),
 
       addChord: (chord, index) => get().addChords([chord], index),
       addChords: (chords, index, flats) =>
@@ -154,11 +158,14 @@ export interface Target {
 export function useTarget(): Target | null {
   // Select stable references only; deriving a new object inside the selector would re-render forever.
   const selected = useMusicStore((s) => s.selected);
+  const selectedFlats = useMusicStore((s) => s.selectedFlats);
   const step = useMusicStore((s) => s.progression.steps[s.progression.active]);
   return useMemo(() => {
-    if (selected) return { chord: selected, name: chordName(selected), notes: chordVoicing(selected, CHORD_DISPLAY_MIDI), flats: false };
+    if (selected) {
+      return { chord: selected, name: chordName(selected, selectedFlats), notes: chordVoicing(selected, CHORD_DISPLAY_MIDI), flats: selectedFlats };
+    }
     const chord = step && stepChord(step);
     if (!chord) return null;
     return { chord, name: stepName(step), notes: stepVoicing(step), flats: !!step.flats };
-  }, [selected, step]);
+  }, [selected, selectedFlats, step]);
 }

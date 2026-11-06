@@ -24,6 +24,7 @@ export const CHORD_QUALITIES: readonly ChordQuality[] = [
   { id: 'm7b5', symbol: 'm7b5', label: 'demi-diminué', intervals: [0, 3, 6, 10] },
   { id: 'dim7', symbol: 'dim7', label: 'septième diminuée', intervals: [0, 3, 6, 9] },
   { id: 'mMaj7', symbol: 'mMaj7', label: 'mineur septième majeure', intervals: [0, 3, 7, 11] },
+  { id: 'maj7aug5', symbol: 'maj7#5', label: 'septième majeure quinte augmentée', intervals: [0, 4, 8, 11] },
   { id: '7sus4', symbol: '7sus4', label: 'septième sus4', intervals: [0, 5, 7, 10] },
   // Listed after the 7ths: same notes as m7 / m7b5 of another root (C6 = Am7),
   // so the bass decides and a 7th wins when the bass is neither root.
